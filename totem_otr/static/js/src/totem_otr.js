@@ -5,9 +5,9 @@ function TotemOTRXBlock(runtime, element) {
         $('.count', element).text(result.count);
     }
 
-    var handlerUrl = runtime.handlerUrl(element, 'increment_count');
+    var handlerUrl = runtime.handlerUrl(element, 'submit_jid');
 
-    $('p', element).click(function(eventObject) {
+    $('.jid', element).click(function(eventObject) {
         $.ajax({
             type: "POST",
             url: handlerUrl,
