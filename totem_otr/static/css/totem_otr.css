@@ -1,0 +1,9 @@
+/* CSS for TotemOTRXBlock */
+
+.totem_otr_block .count {
+    font-weight: bold;
+}
+
+.totem_otr_block p {
+    cursor: pointer;
+}
