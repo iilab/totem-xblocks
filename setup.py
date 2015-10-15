@@ -23,7 +23,7 @@ def package_data(pkg, roots):
 setup(
     name='totem_otr-xblock',
     version='0.1',
-    description='totem_otr XBlock',   # TODO: write a better description.
+    description='Totem OTR Assessment', 
     packages=[
         'totem_otr',
     ],
@@ -32,7 +32,8 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'totem_otr = totem_otr:TotemOTRXBlock',
+            'totem_otr_jid_input = totem_otr:TotemOTR_JIDInput',
+            'totem_otr_trust = totem_otr:TotemOTR_Trust',
         ]
     },
     package_data=package_data("totem_otr", ["static", "public"]),
