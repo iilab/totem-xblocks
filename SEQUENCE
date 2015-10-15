@@ -1,0 +1,48 @@
+sequenceDiagram
+    participant Student
+    Note right of Student: Getting to the Quizz
+    Student->>EdX: Loads Totem Assessment
+    EdX->>Totem XBlock: Calls XBlock
+    Totem XBlock->>EdX: Returns Student View
+    EdX-->>Totem XBlock: Polling
+    Totem XBlock-->>EdX: Nothing to report
+    Note right of Student: On IM Client
+    Mcabber->Mcabber: Wait for any contact request.
+    Student->>Totem XBlock: Enters jabber id
+    Totem XBlock->>Mcabber: Hash jabber id with secret (/data/:hash)
+    alt Success
+      Student->>Mcabber: Adds totem@jabber.ccc.de
+      Mcabber->>Totem XBlock: Contact added state (/data/:hash/state)
+      EdX-->>Totem XBlock: Polling
+      Totem XBlock->>EdX: Polling response "Contact added!"
+    else Failure
+      Totem XBlock->>Totem XBlock: times out
+      EdX-->>Totem XBlock: Polling
+      Totem XBlock->>EdX: Polling response "Timed Out!"
+      EdX->>Totem XBlock: Contact not added Handler
+      Totem XBlock->>Student: Hint about contact not added
+    end
+    Note right of Student: Totem initiated OTR session
+    alt Success
+      Mcabber->>Student: Initiates OTR
+      Mcabber->>Totem XBlock: OTR initiated state (/data/:hash/state)
+      EdX-->>Totem XBlock: Polling
+      Totem XBlock->>EdX: Polling response "OTR!"
+    else Failure
+      Mcabber->>Totem XBlock: Error state (/data/:hash/state)
+      Totem XBlock->>Student: Error!
+    end
+    Note right of Student: Student initiated SMP Dance
+    Totem XBlock->>Student: Displays secret.
+    Totem XBlock->>Mcabber: Sends secret (fifo->eventcmd-ng)
+    Student->>Mcabber: Initiates SMP Dance using displayed secret.
+    Mcabber->>Mcabber: Verifies Secret.
+    alt Success
+      Mcabber->>Totem XBlock: SMP dance initiated (/data/:hash/state)
+      Student->>Mcabber: Initiates SMP Dance
+      EdX-->>Totem XBlock: Polling
+      Totem XBlock->>EdX: Polling response "OTR!"
+    else Failure
+      Mcabber->>Totem XBlock: SMP Failed state (/data/:hash/state)
+      Totem XBlock->>Student: SMP Failed!
+    end
