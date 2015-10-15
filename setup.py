@@ -32,9 +32,10 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'totem_otr_jid_input = totem_otr:TotemOTR_JIDInput',
-            'totem_otr_trust = totem_otr:TotemOTR_Trust',
+            'totem_otr = totem_otr:TotemOTRXBlock',
+            'totem_otr_status = totem_otr:StatusBlock',
         ]
     },
     package_data=package_data("totem_otr", ["static", "public"]),
 )
+

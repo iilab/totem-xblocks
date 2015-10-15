@@ -1,1 +1,1 @@
-from .totem_otr import TotemOTRXBlock
+from .totem_otr import TotemOTRXBlock, StatusBlock
