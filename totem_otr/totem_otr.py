@@ -63,18 +63,18 @@ class TotemOTRXBlock(XBlock):
 
         html = u"""
                 <input class='jid' type='text' name='input' value='{self.jid}'/>
-                <span class='submit'>Submit!</span>
+                <input type='button' class='submit' value='Submit!'/>
                 <br />
                 <span class='message'></span>
                 """.format(self=self)
-           
+
         frag = Fragment(html)
     #    frag.add_css(self.resource_string("static/css/totem_otr.css"))
         frag.add_javascript("""
             function TotemOTRXBlock(runtime, element) {
 
-                function updateCount(result) {
-                    $('.message', element).text('Success! Use this as our shared "secret: "'+result['smp_secret']);
+                function shareSMP(result) {
+                    $('.message', element).text('Well done! Use this as our shared "secret: "'+result['smp_secret']);
                 }
 
                 var handlerUrl = runtime.handlerUrl(element, 'submit_jid');
@@ -84,7 +84,7 @@ class TotemOTRXBlock(XBlock):
                         type: "POST",
                         url: handlerUrl,
                         data: JSON.stringify({"jid": $('.jid').val()}),
-                        success: updateCount
+                        success: shareSMP
                     });
                 });
 
@@ -153,8 +153,7 @@ class TotemOTRXBlock(XBlock):
                         <p>Please install an instant messaging client which supports OTR and follow these steps:</p>
                         <ol>
                             <li>Create a Jabber account and paste your Jabber ID in the first field.</li>
-                            <li>Add totem@jabber.ccc.de to your contacts</li>
-                            <li>Verify that the OTR encyrpted session has started.</li>
+                            <li>Verify that the OTR encrypted session has started.</li>
                             <li>Establish trust by verifying the identity of totem@jabber.ccc.de with a shared secret.</li>
                         </ol>
                     </html_demo>
