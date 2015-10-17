@@ -1,6 +1,6 @@
 """TO-DO: Write a description of what this XBlock is."""
 
-import pkg_resources, hmac, hashlib, os, sys
+import pkg_resources, hmac, hashlib, os, sys, string, random
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String
@@ -23,6 +23,11 @@ class TotemOTRXBlock(XBlock):
     learner_hash = String(
         default='', scope=Scope.user_state,
         help="Learner Hash",
+    )
+
+    smp_secret = String(
+        default='', scope=Scope.user_state,
+        help="SMP Secret",
     )
 
     secret = String(
@@ -57,8 +62,9 @@ class TotemOTRXBlock(XBlock):
 
         html = u"""
                 <input class='jid' type='text' name='input' value='{self.jid}'/>
-                <span class='message'></span>
                 <span class='submit'>Submit!</span>
+                <br />
+                <span class='message'></span>
                 """.format(self=self)
            
         frag = Fragment(html)
@@ -67,7 +73,7 @@ class TotemOTRXBlock(XBlock):
             function TotemOTRXBlock(runtime, element) {
 
                 function updateCount(result) {
-                    $('.message', element).text("Success!");
+                    $('.message', element).text('Success! Use this as our shared "secret: "'+result['smp_secret']);
                 }
 
                 var handlerUrl = runtime.handlerUrl(element, 'submit_jid');
@@ -102,14 +108,25 @@ class TotemOTRXBlock(XBlock):
         self.jid = data['jid']
         self.learner_hash = hmac.new(str(self.secret), str(self.jid), hashlib.sha256).hexdigest()
 
+        self.smp_secret=''.join(random.choice(string.ascii_uppercase +
+            string.digits + string.ascii_lowercase) for _ in range(32))
+
+        with open('/opt/privacy_challenge/data/%s/smpsecret', 'w') as fd:
+            fd.write(self.smp_secret)
+
 	msg = "Hi %s! Thanks for using Totem. How are you today?" % (self.jid.split('@')[0])
 
         with open('/opt/privacy-challenge/otr/mcabber.fifo', 'a') as fd:
+            # start OTR
+            fd.write("otr start %s\n" % (self.jid))
+            # greet student
             fd.write("say_to -q %s %s\n" % (self.jid, msg))
+            fd.write('say_to -q %s Now please initiate the SMP dance using the shared "secret" shown in the web browser\n' % (self.jid))
 
         return { "learner_hash": self.learner_hash, 
                  "secret": str(self.secret),
                  "jid": str(self.jid),
+                 "smp_secret": str(self.smp_secret),
                }
 
     @XBlock.json_handler
