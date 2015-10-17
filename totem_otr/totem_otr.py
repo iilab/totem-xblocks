@@ -6,7 +6,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String
 from xblock.fragment import Fragment
 
-basepath = '/opt/privacy-challenge'
+basepath = '/opt/totem-bots'
 
 class TotemOTRXBlock(XBlock):
     """
