@@ -6,6 +6,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String
 from xblock.fragment import Fragment
 
+basepath = '/opt/privacy-challenge'
 
 class TotemOTRXBlock(XBlock):
     """
@@ -53,7 +54,7 @@ class TotemOTRXBlock(XBlock):
         when viewing courses.
         """
 
-        with open('/opt/privacy-challenge/secret','r') as f:
+        with open('%s/secret' % basepath ,'r') as f:
             self.secret=f.read().strip()
 
         #
@@ -111,12 +112,12 @@ class TotemOTRXBlock(XBlock):
         self.smp_secret=''.join(random.choice(string.ascii_uppercase +
             string.digits + string.ascii_lowercase) for _ in range(32))
 
-        with open('/opt/privacy_challenge/data/%s/smpsecret', 'w') as fd:
+        with open('%s/data/%s/smpsecret' % (basepath,self.learner_hash), 'w+') as fd:
             fd.write(self.smp_secret)
 
 	msg = "Hi %s! Thanks for using Totem. How are you today?" % (self.jid.split('@')[0])
 
-        with open('/opt/privacy-challenge/otr/mcabber.fifo', 'a') as fd:
+        with open('%s/otr/mcabber.fifo' % basepath, 'a') as fd:
             # start OTR
             fd.write("otr start %s\n" % (self.jid))
             # greet student
